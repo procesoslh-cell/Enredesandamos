@@ -11,7 +11,7 @@ const normalize = (s: string) => ({ LISTA: "PENDIENTE", EN_PROCESO: "EN_CURSO", 
 
 export default async function Page({ searchParams }: { searchParams?: Promise<{ clientId?: string; responsibleId?: string; status?: string; projectId?: string }> }) {
   const sp = await searchParams;
-  const g = requireModule("planner");
+  const g = await requireModule("planner");
   if (!g.ok) redirect("/home");
   const selectedClient = Number(sp?.clientId || 0);
   const selectedResponsible = Number(sp?.responsibleId || 0);

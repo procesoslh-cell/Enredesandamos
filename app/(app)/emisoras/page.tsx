@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 
 export default async function EmisorasPage() {
-  const gate = requireModule("emisoras"); if (!gate.ok) redirect("/home");
+  const gate = await requireModule("emisoras"); if (!gate.ok) redirect("/home");
   const issuers = await prisma.issuer.findMany({ orderBy: [{ active: "desc" }, { name: "asc" }] });
   return <div className="content-card"><div className="topbar"><div><h1 className="section-title">Emisoras</h1><p className="muted">Configurá las socias que pueden emitir facturas: datos fiscales, punto de venta, contacto y estado.</p></div><span className="pill">Facturación</span></div>
     <section className="card"><h2>Nueva emisora</h2><form action="/api/issuers/save" method="POST" className="issuer-form"><label>Nombre</label><input name="name" required placeholder="Nombre de la socia" /><label>CUIT</label><input name="taxId" placeholder="20-00000000-0" /><label>Condición fiscal</label><select name="fiscalCondition"><option>Monotributo</option><option>Responsable Inscripto</option><option>Exento</option></select><label>Punto de venta</label><input name="pointOfSale" placeholder="0001" /><label>Email</label><input name="email" type="email" /><label>Dirección fiscal</label><input name="address" /><label>Teléfono</label><input name="phone" /><label>Tipo factura</label><select name="defaultInvoiceType"><option value="C">Factura C</option><option value="B">Factura B</option><option value="A">Factura A</option></select><label>Observaciones</label><input name="notes" placeholder="Uso interno" /><button>Guardar emisora</button></form></section>

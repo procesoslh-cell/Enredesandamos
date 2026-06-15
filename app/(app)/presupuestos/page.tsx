@@ -6,7 +6,7 @@ import { money, dateOnly } from "@/lib/format";
 const quoteStates = ["BORRADOR", "ENVIADO", "VISTO", "ACEPTADO", "RECHAZADO", "FACTURADO"];
 
 export default async function PresupuestosPage({ searchParams }: { searchParams?: { clientId?: string } }) {
-  const gate = requireModule("presupuestos"); if (!gate.ok) redirect("/home");
+  const gate = await requireModule("presupuestos"); if (!gate.ok) redirect("/home");
   const defaultClient = Number(searchParams?.clientId || 0);
   const [quotes, clients, services] = await Promise.all([
     prisma.quote.findMany({ include: { client: true, items: true, invoice: true }, orderBy: { createdAt: "desc" } }),

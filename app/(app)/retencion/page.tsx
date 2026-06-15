@@ -15,7 +15,7 @@ function durationMonths(start: Date, end: Date) {
 }
 
 export default async function Page() {
-  const g = requireModule("retencion"); if (!g.ok) redirect("/home");
+  const g = await requireModule("retencion"); if (!g.ok) redirect("/home");
   const [contracts, clients] = await Promise.all([
     prisma.contract.findMany({ include: { client: true }, orderBy: { endDate: "asc" } }),
     prisma.client.findMany({ orderBy: { commercialName: "asc" } })
