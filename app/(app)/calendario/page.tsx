@@ -25,7 +25,7 @@ type CalendarItem = { id: string; title: string; date: Date; type: string; statu
 
 export default async function Page({ searchParams }: { searchParams?: Promise<{ year?: string; month?: string; clientId?: string; projectId?: string; responsibleId?: string; type?: string }> }) {
   const sp = await searchParams;
-  const gate = requireModule("calendario"); if (!gate.ok) redirect("/home");
+  const gate = await requireModule("calendario"); if (!gate.ok) redirect("/home");
   const now = new Date();
   const year = Number(sp?.year || now.getFullYear());
   const month = Math.max(0, Math.min(11, Number(sp?.month || now.getMonth() + 1) - 1));
