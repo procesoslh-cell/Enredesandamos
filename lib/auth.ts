@@ -1,8 +1,6 @@
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
 
-type CookieReader = { get(name: string): { value?: string } | undefined };
-
 export type SessionUser = {
   id: number;
   email: string;
@@ -13,15 +11,23 @@ export type SessionUser = {
   clientId?: number | null;
 };
 
+const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-cambiar";
+
 export function signToken(payload: SessionUser) {
-  return jwt.sign(payload, process.env.JWT_SECRET || "dev-secret", { expiresIn: "7d" });
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: "7d" });
 }
 
-export function getSession() {
-  const cookieStore = cookies() as unknown as CookieReader;
+export async function getSession() {
+  const cookieStore = await cookies();
   const token = cookieStore.get("era_token")?.value;
+
   if (!token) return null;
-  try { return jwt.verify(token, process.env.JWT_SECRET || "dev-secret") as SessionUser; } catch { return null; }
+
+  try {
+    return jwt.verify(token, JWT_SECRET) as SessionUser;
+  } catch {
+    return null;
+  }
 }
 
 export function canAccess(role: string, module: string) {
@@ -36,14 +42,19 @@ export function canAccess(role: string, module: string) {
     COMMUNITY_MANAGER: ["home", "planner", "calendario", "notificaciones", "omnicanal"],
     ADS_MANAGER: ["home", "planner", "omnicanal", "notificaciones", "calendario", "dashboard"],
     FINANZAS: ["home", "clientes", "presupuestos", "facturacion", "emisoras", "gastos", "dashboard", "notificaciones", "calendario"],
-    CLIENTE: ["home", "portal-cliente", "notificaciones"]
+    CLIENTE: ["home", "portal-cliente", "notificaciones"],
   };
+
   return rules[role]?.includes("*") || rules[role]?.includes(module);
 }
 
-export function requireModule(module: string) {
-  const session = getSession();
-  if (!session || session.approvalStatus === "PENDIENTE") return { ok: false, session: null };
+export async function requireModule(module: string) {
+  const session = await getSession();
+
+  if (!session || session.approvalStatus === "PENDIENTE") {
+    return { ok: false, session: null };
+  }
+
   return { ok: canAccess(session.role, module), session };
 }
 
