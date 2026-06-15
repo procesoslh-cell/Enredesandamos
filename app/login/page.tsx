@@ -31,9 +31,9 @@ export default async function LoginPage({ searchParams }: { searchParams?: Promi
             <label>Contraseña</label>
             <input name="password" type="password" defaultValue="Admin123!" />
             <div className="demo-access">
-              <strong>Demo</strong>
-              <span>Admin: admin@enredesandamos.com / Admin123!</span>
-              <span>Cliente: cliente@soplodevida.com / Cliente123!</span>
+              <strong>Diseñado y desarrollado por</strong>
+              <span>Nexcore Consulting</span>
+              <span></span>
             </div>
             <button style={{ width: "100%" }}>Entrar</button>
           </form>
