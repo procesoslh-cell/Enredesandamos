@@ -6,7 +6,8 @@ import { money, daysUntil } from "@/lib/format";
 import { phraseOfTheDay } from "@/lib/inspiration";
 
 export default async function HomePage() {
-  const session = getSession();
+  const session = await getSession();
+
   const [clients, contracts, invoices, tasks, quotes, expenses] = await Promise.all([
     prisma.client.count({ where: { status: "ACTIVO" } }),
     prisma.contract.findMany({ where: { status: "ACTIVO" }, select: { endDate: true } }),
