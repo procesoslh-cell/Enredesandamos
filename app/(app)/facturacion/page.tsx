@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { money, dateOnly } from "@/lib/format";
 
 export default async function FacturacionPage() {
-  const gate = requireModule("facturacion"); if (!gate.ok) redirect("/home");
+  const gate = await requireModule("facturacion"); if (!gate.ok) redirect("/home");
   const [invoices, issuers, acceptedQuotes] = await Promise.all([
     prisma.invoice.findMany({ include: { client: true, issuer: true, quote: { include: { items: true } } }, orderBy: { createdAt: "desc" } }),
     prisma.issuer.findMany({ where: { active: true }, orderBy: { name: "asc" } }),
@@ -31,3 +31,6 @@ export default async function FacturacionPage() {
     <section className="card"><div className="topbar"><div><h2>Facturas emitidas</h2><p className="muted">Descargá cada factura con logo, cliente, emisora, servicios, descuentos y total.</p></div></div><table className="table"><thead><tr><th>Número</th><th>Cliente</th><th>Servicios</th><th>Emisora</th><th>Estado</th><th>Vence</th><th>Monto</th><th>Acciones</th></tr></thead><tbody>{invoices.map(i => <tr key={i.id}><td>{i.number}</td><td>{i.client.commercialName}</td><td>{i.quote?.items.map(x => x.description).join(", ") || "Servicios de marketing"}</td><td>{i.issuer?.name || "Sin emisora"}</td><td><span className="badge">{i.status}</span></td><td>{dateOnly(i.dueDate)}</td><td>{money(i.amount)}</td><td><a className="btn secondary small" href={`/api/invoices/${i.id}/pdf`}>Descargar factura</a></td></tr>)}</tbody></table></section>
   </div>;
 }
+
+
+

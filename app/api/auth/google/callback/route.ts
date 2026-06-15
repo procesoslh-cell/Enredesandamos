@@ -62,3 +62,6 @@ export async function GET(req: Request) {
   (await cookies()).set("era_token", signToken(session), { httpOnly: true, sameSite: "lax", path: "/" });
   return Response.redirect(new URL(user.role === "CLIENTE" ? "/portal-cliente" : "/home", req.url));
 }
+
+
+

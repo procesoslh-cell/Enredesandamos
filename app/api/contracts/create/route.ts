@@ -1,1 +1,4 @@
 import { prisma } from "@/lib/prisma";import { redirect } from "next/navigation";import { revalidatePath } from "next/cache";export async function POST(req:Request){const f=await req.formData();await prisma.contract.create({data:{clientId:Number(f.get("clientId")),name:String(f.get("name")||"Contrato"),startDate:new Date(String(f.get("startDate"))+"T00:00:00"),endDate:new Date(String(f.get("endDate"))+"T00:00:00"),monthlyValue:Number(f.get("monthlyValue")||0),renewalStatus:String(f.get("renewalStatus")||"PENDIENTE"),contractPdfName:String(f.get("contractPdfName")||""),contractPdfUrl:String(f.get("contractPdfUrl")||""),retentionNotes:String(f.get("retentionNotes")||"")}});revalidatePath("/retencion");redirect("/retencion")}
+
+
+

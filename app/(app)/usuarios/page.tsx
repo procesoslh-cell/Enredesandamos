@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { createUser, updateUserAccess } from "@/lib/actions";
 const roles = ["SUPER_ADMIN", "ADMIN", "DIRECCION", "DIRECTORA_CUENTAS", "PROJECT_MANAGER", "DISENADORA", "COPYWRITER", "COMMUNITY_MANAGER", "ADS_MANAGER", "FINANZAS", "CLIENTE"];
 export default async function UsuariosPage() {
-  const gate = requireModule("usuarios"); if (!gate.ok) redirect("/home");
+  const gate = await requireModule("usuarios"); if (!gate.ok) redirect("/home");
   const [users, clients] = await Promise.all([
     prisma.user.findMany({ include: { client: true }, orderBy: [{ approvalStatus: "asc" }, { createdAt: "desc" }] }),
     prisma.client.findMany({ orderBy: { commercialName: "asc" } })
@@ -17,3 +17,6 @@ export default async function UsuariosPage() {
     <table className="table"><thead><tr><th>Nombre</th><th>Email</th><th>Tipo</th><th>Rol</th><th>Cliente</th><th>Estado</th></tr></thead><tbody>{users.map(u => <tr key={u.id}><td>{u.name}</td><td>{u.email}</td><td>{u.accountType}</td><td><span className="badge">{u.role}</span></td><td>{u.client?.commercialName || "-"}</td><td>{u.active ? "Aprobado" : u.approvalStatus}</td></tr>)}</tbody></table>
   </div>;
 }
+
+
+

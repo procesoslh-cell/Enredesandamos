@@ -29,3 +29,4 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
   });
   return new Response(pdf, { headers: { "Content-Type": "application/pdf", "Content-Disposition": `attachment; filename="${quote.number}-presupuesto.pdf"` } });
 }
+

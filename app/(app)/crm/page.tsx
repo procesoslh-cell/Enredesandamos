@@ -17,7 +17,7 @@ const labels: Record<string, string> = {
 const legacy: Record<string, string> = { NUEVO: "PROSPECTO", CONTACTADO: "PRIMER_CONTACTO" };
 
 export default async function CRMPage() {
-  const gate = requireModule("crm");
+  const gate = await requireModule("crm");
   if (!gate.ok) redirect("/home");
   const leads = await prisma.lead.findMany({ orderBy: { createdAt: "desc" } });
   const normalized = leads.map(l => ({ ...l, status: legacy[l.status] || l.status }));
@@ -71,3 +71,6 @@ export default async function CRMPage() {
     </div>
   );
 }
+
+
+

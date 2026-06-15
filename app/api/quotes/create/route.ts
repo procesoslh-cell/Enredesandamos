@@ -18,3 +18,6 @@ export async function POST(req: Request) {
   await prisma.notification.create({ data: { title: "Presupuesto creado", message: `Se creó ${quote.number}.`, type: "VENTAS", link: "/presupuestos" }});
   revalidatePath("/presupuestos"); redirect("/presupuestos");
 }
+
+
+

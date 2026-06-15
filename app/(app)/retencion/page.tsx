@@ -15,7 +15,7 @@ function durationMonths(start: Date, end: Date) {
 }
 
 export default async function Page() {
-  const g = requireModule("retencion"); if (!g.ok) redirect("/home");
+  const g = await requireModule("retencion"); if (!g.ok) redirect("/home");
   const [contracts, clients] = await Promise.all([
     prisma.contract.findMany({ include: { client: true }, orderBy: { endDate: "asc" } }),
     prisma.client.findMany({ orderBy: { commercialName: "asc" } })
@@ -28,3 +28,6 @@ export default async function Page() {
     <div className="kanban retention-board">{statuses.map(st => <div className="column" key={st}><h3>{st}</h3>{contracts.filter(c => c.renewalStatus === st).map(c => { const d = daysUntil(c.endDate); const b = renewalBadge(d); return <div className="task-card" key={c.id}><strong>{c.client.commercialName}</strong><p>{c.name}</p><p className="mini">Inicio: {dateOnly(c.startDate)} · Fin: {dateOnly(c.endDate)}</p><p className="mini">Duración: {durationMonths(c.startDate, c.endDate)} meses · faltan {d} días</p><p><strong>{money(c.monthlyValue)}</strong>/mes</p>{c.contractPdfUrl ? <p><a className="btn secondary" href={c.contractPdfUrl} target="_blank">Ver contrato PDF</a></p> : null}<span className={b.cls}>{b.label}</span><a className="btn" style={{ marginTop: 12 }} href={`/presupuestos?clientId=${c.clientId}&renewalContract=${c.id}`}>Crear propuesta de renovación</a><form action="/api/contracts/update-status" method="POST" style={{ marginTop: 12 }}><input type="hidden" name="id" value={c.id} /><label>Estado</label><select name="renewalStatus" defaultValue={c.renewalStatus}>{statuses.map(s => <option key={s}>{s}</option>)}</select><label>Notas</label><textarea name="retentionNotes" defaultValue={c.retentionNotes || ""} rows={2} /><button style={{ marginTop: 8 }}>Actualizar</button></form></div>})}</div>)}</div>
   </div>;
 }
+
+
+

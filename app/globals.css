@@ -33,3 +33,4 @@
 
 /* V4.5 Entrega 7 - emisoras reales y PDFs limpios */
 .issuer-form{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;align-items:end}.issuer-form.compact{grid-template-columns:repeat(2,minmax(0,1fr));background:#fbf8fc;border:1px solid #f0edf2;border-radius:20px;padding:14px;margin:12px 0}.issuer-detail{border-left:6px solid var(--era-lila)}.mini-link{font-size:13px;font-weight:900;color:#7d5a96;text-decoration:none}.issuer-form .form-actions{grid-column:1/-1}.issuer-form button{min-height:44px}@media(max-width:1050px){.issuer-form,.issuer-form.compact{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:680px){.issuer-form,.issuer-form.compact{grid-template-columns:1fr}}
+

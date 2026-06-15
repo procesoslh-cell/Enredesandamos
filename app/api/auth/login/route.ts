@@ -15,3 +15,6 @@ export async function POST(req: Request) {
   (await cookies()).set("era_token", token, { httpOnly: true, sameSite: "lax", path: "/" });
   redirect(user.role === "CLIENTE" ? "/portal-cliente" : "/home");
 }
+
+
+
