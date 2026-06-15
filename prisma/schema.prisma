@@ -1,0 +1,318 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             Int      @id @default(autoincrement())
+  name           String
+  email          String   @unique
+  passwordHash   String?
+  role           String   @default("PENDIENTE")
+  accountType    String   @default("COLABORADOR")
+  approvalStatus String   @default("PENDIENTE")
+  active         Boolean  @default(false)
+  googleId       String?  @unique
+  avatarUrl      String?
+  requestedAt    DateTime @default(now())
+  approvedAt     DateTime?
+  createdAt      DateTime @default(now())
+  clientId       Int?
+  client         Client?  @relation(fields: [clientId], references: [id])
+  assignedTasks  Task[]
+  notifications  Notification[]
+  comments       TaskComment[]
+  createdEvents  CalendarEvent[] @relation("CreatedEvents")
+  assignedEvents CalendarEvent[] @relation("AssignedEvents")
+}
+
+model Lead {
+  id        Int      @id @default(autoincrement())
+  company   String
+  contact   String?
+  email     String?
+  phone     String?
+  source    String?
+  status    String   @default("NUEVO")
+  notes     String?
+  createdAt DateTime @default(now())
+}
+
+model Client {
+  id              Int      @id @default(autoincrement())
+  businessName    String
+  commercialName  String
+  taxId           String?
+  email           String?
+  phone           String?
+  whatsapp        String?
+  address         String?
+  city            String?
+  province        String?
+  country         String?  @default("Argentina")
+  website         String?
+  logoUrl         String?
+  driveFolder     String?
+  brandbookUrl    String?
+  instagram       String?
+  facebook        String?
+  tiktok          String?
+  linkedin        String?
+  youtube         String?
+  metaBusinessId  String?
+  adAccountId     String?
+  googleAnalytics String?
+  status          String   @default("ACTIVO")
+  createdAt       DateTime @default(now())
+  quotes          Quote[]
+  invoices        Invoice[]
+  expenses        Expense[]
+  projects        Project[]
+  contracts       Contract[]
+  contentItems    ContentItem[]
+  users           User[]
+  calendarEvents  CalendarEvent[]
+}
+
+model Contract {
+  id              Int      @id @default(autoincrement())
+  clientId        Int
+  name            String
+  startDate       DateTime
+  endDate         DateTime
+  monthlyValue    Float    @default(0)
+  status          String   @default("ACTIVO")
+  renewalStatus   String   @default("PENDIENTE")
+  contractPdfName String?
+  contractPdfUrl  String?
+  retentionNotes  String?
+  createdAt       DateTime @default(now())
+  client          Client   @relation(fields: [clientId], references: [id])
+}
+
+model TaskComment {
+  id        Int      @id @default(autoincrement())
+  taskId    Int
+  userId    Int?
+  message   String
+  progress  Int?
+  createdAt DateTime @default(now())
+  task      Task @relation(fields: [taskId], references: [id])
+  user      User? @relation(fields: [userId], references: [id])
+}
+
+model TaskAttachment {
+  id        Int      @id @default(autoincrement())
+  taskId    Int
+  name      String
+  url       String
+  type      String?
+  createdAt DateTime @default(now())
+  task      Task @relation(fields: [taskId], references: [id])
+}
+
+model ContentItem {
+  id          Int      @id @default(autoincrement())
+  clientId    Int
+  title       String
+  channel     String
+  contentType String
+  publishDate DateTime
+  status      String   @default("PLANIFICADO")
+  notes       String?
+  client      Client @relation(fields: [clientId], references: [id])
+}
+
+model Service {
+  id          Int      @id @default(autoincrement())
+  code        String   @unique
+  name        String
+  description String?
+  price       Float
+  taxRate     Float    @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  quoteItems  QuoteItem[]
+}
+
+model Quote {
+  id            Int      @id @default(autoincrement())
+  number        String   @unique
+  clientId      Int
+  status        String   @default("BORRADOR")
+  subtotal      Float    @default(0)
+  discountType  String?  @default("PERCENT")
+  discountValue Float    @default(0)
+  total         Float    @default(0)
+  notes         String?
+  validUntil    DateTime?
+  acceptedAt    DateTime?
+  createdAt     DateTime @default(now())
+  client        Client      @relation(fields: [clientId], references: [id])
+  items         QuoteItem[]
+  invoice       Invoice?
+}
+
+model QuoteItem {
+  id          Int    @id @default(autoincrement())
+  quoteId     Int
+  serviceId   Int?
+  description String
+  quantity    Int    @default(1)
+  unitPrice   Float
+  total       Float
+  quote       Quote    @relation(fields: [quoteId], references: [id])
+  service     Service? @relation(fields: [serviceId], references: [id])
+}
+
+model Invoice {
+  id        Int      @id @default(autoincrement())
+  number    String   @unique
+  clientId  Int
+  quoteId   Int?     @unique
+  issuerId  Int?
+  status    String   @default("PENDIENTE")
+  amount    Float
+  dueDate   DateTime?
+  paidAt    DateTime?
+  fiscalStatus String @default("BORRADOR")
+  invoiceType  String @default("C")
+  pointOfSale  String?
+  cae          String?
+  caeDueDate   DateTime?
+  notes        String?
+  createdAt DateTime @default(now())
+  client    Client @relation(fields: [clientId], references: [id])
+  quote     Quote? @relation(fields: [quoteId], references: [id])
+  issuer    Issuer? @relation(fields: [issuerId], references: [id])
+}
+
+model Issuer {
+  id              Int      @id @default(autoincrement())
+  name            String
+  taxId           String?
+  address         String?
+  fiscalCondition String   @default("Monotributo")
+  pointOfSale     String?
+  email           String?
+  phone           String?
+  defaultInvoiceType String @default("C")
+  notes           String?
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  invoices        Invoice[]
+}
+
+model Expense {
+  id          Int      @id @default(autoincrement())
+  clientId    Int?
+  projectId   Int?
+  category    String
+  description String
+  amount      Float
+  date        DateTime @default(now())
+  client      Client?  @relation(fields: [clientId], references: [id])
+  project     Project? @relation(fields: [projectId], references: [id])
+}
+
+model Project {
+  id          Int      @id @default(autoincrement())
+  clientId    Int
+  name        String
+  serviceType String?
+  status      String   @default("ACTIVO")
+  startDate   DateTime
+  endDate     DateTime?
+  createdAt   DateTime @default(now())
+  client      Client    @relation(fields: [clientId], references: [id])
+  stages      Stage[]
+  tasks       Task[]
+  expenses    Expense[]
+  calendarEvents CalendarEvent[]
+}
+
+model Stage {
+  id        Int      @id @default(autoincrement())
+  projectId Int
+  name      String
+  startDate DateTime
+  endDate   DateTime
+  order     Int      @default(0)
+  project   Project @relation(fields: [projectId], references: [id])
+  tasks     Task[]
+}
+
+model Task {
+  id            Int      @id @default(autoincrement())
+  projectId     Int
+  stageId       Int?
+  title         String
+  description   String?
+  status        String   @default("LISTA")
+  priority      String   @default("MEDIA")
+  progress      Int      @default(0)
+  responsibleId Int?
+  startDate     DateTime?
+  dueDate       DateTime?
+  completedAt   DateTime?
+  dependsOnId   Int?
+  project       Project @relation(fields: [projectId], references: [id])
+  stage         Stage?  @relation(fields: [stageId], references: [id])
+  responsible   User?   @relation(fields: [responsibleId], references: [id])
+  comments      TaskComment[]
+  attachments   TaskAttachment[]
+  calendarEvents CalendarEvent[]
+}
+
+model Campaign {
+  id          Int      @id @default(autoincrement())
+  name        String
+  channel     String
+  segment     String?
+  subject     String?
+  message     String
+  status      String   @default("BORRADOR")
+  scheduledAt DateTime?
+  createdAt   DateTime @default(now())
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  title     String
+  message   String
+  type      String   @default("INFO")
+  read      Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+  user      User? @relation(fields: [userId], references: [id])
+}
+
+
+model CalendarEvent {
+  id            Int      @id @default(autoincrement())
+  title         String
+  description   String?
+  eventType     String   @default("TAREA")
+  status        String   @default("PLANIFICADO")
+  priority      String   @default("MEDIA")
+  startDate     DateTime
+  endDate       DateTime?
+  allDay        Boolean  @default(false)
+  clientId      Int?
+  projectId     Int?
+  taskId        Int?
+  responsibleId Int?
+  createdById   Int?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  client        Client?  @relation(fields: [clientId], references: [id])
+  project       Project? @relation(fields: [projectId], references: [id])
+  task          Task?    @relation(fields: [taskId], references: [id])
+  responsible   User?    @relation("AssignedEvents", fields: [responsibleId], references: [id])
+  createdBy     User?    @relation("CreatedEvents", fields: [createdById], references: [id])
+}
