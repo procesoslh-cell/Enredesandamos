@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { money, dateOnly } from "@/lib/format";
 
 export default async function FacturacionPage() {
-  const gate = await requireModule("facturacion"); if (!gate.ok) redirect("/home");
+  const gate = requireModule("facturacion"); if (!gate.ok) redirect("/home");
   const [invoices, issuers, acceptedQuotes] = await Promise.all([
     prisma.invoice.findMany({ include: { client: true, issuer: true, quote: { include: { items: true } } }, orderBy: { createdAt: "desc" } }),
     prisma.issuer.findMany({ where: { active: true }, orderBy: { name: "asc" } }),

@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { createUser, updateUserAccess } from "@/lib/actions";
 const roles = ["SUPER_ADMIN", "ADMIN", "DIRECCION", "DIRECTORA_CUENTAS", "PROJECT_MANAGER", "DISENADORA", "COPYWRITER", "COMMUNITY_MANAGER", "ADS_MANAGER", "FINANZAS", "CLIENTE"];
 export default async function UsuariosPage() {
-  const gate = await requireModule("usuarios"); if (!gate.ok) redirect("/home");
+  const gate = requireModule("usuarios"); if (!gate.ok) redirect("/home");
   const [users, clients] = await Promise.all([
     prisma.user.findMany({ include: { client: true }, orderBy: [{ approvalStatus: "asc" }, { createdAt: "desc" }] }),
     prisma.client.findMany({ orderBy: { commercialName: "asc" } })

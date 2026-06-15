@@ -5,7 +5,7 @@ import { StatCard } from "@/components/stat-card";
 import { money } from "@/lib/format";
 
 export default async function DashboardPage() {
-  const gate = await requireModule("dashboard"); if (!gate.ok) redirect("/home");
+  const gate = requireModule("dashboard"); if (!gate.ok) redirect("/home");
   const [clients, leads, quotes, expenses, projects, invoices, tasks] = await Promise.all([
     prisma.client.count(), prisma.lead.count(), prisma.quote.count(), prisma.expense.aggregate({ _sum: { amount: true } }),
     prisma.project.count(), prisma.invoice.findMany(), prisma.task.findMany({ where: { status: { not: "FINALIZADA" } } })

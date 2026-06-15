@@ -52,7 +52,7 @@ function ClientForm({ client }: { client?: any }) {
 
 export default async function Page({ searchParams }: PageProps) {
   const gate = await requireModule("clientes");
-  if (!gate.ok) redirect("/home");
+  if (!g.ok) redirect("/home");
 
   const params = await searchParams;
   const q = (params?.q || "").trim();
